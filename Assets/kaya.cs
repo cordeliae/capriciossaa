@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class kaya : MonoBehaviour
 {
@@ -11,8 +12,7 @@ public class kaya : MonoBehaviour
     [SerializeField] float gossip;
     [SerializeField] float bladder;
     [SerializeField] float job;
-    [SerializeField] float toss;
-    [SerializeField] float bell;
+    //[SerializeField] float toss;
 
     [Header("Cosie")]
     public NavMeshAgent Agent;
@@ -23,12 +23,22 @@ public class kaya : MonoBehaviour
     public GameObject gossipcostam;
     public GameObject jobcostam;
     public GameObject tosscostam;
-    public GameObject bellcostam;
     public GameObject pizza;
     public GameObject pizza2;
 
     public GameObject paczalka;
     public GameObject paczalka2;
+    public GameObject paczalka3;
+
+    bool stopstats = false;
+
+    [Header("slidery")]
+    public Slider nicotineslider;
+    public Slider hygieneslider;
+    public Slider gossipslider;
+    public Slider bladderslider;
+    public Slider jobslider;
+
 
     [Header("Animations")]
     private readonly int IsSitting = Animator.StringToHash("sitting");
@@ -36,6 +46,7 @@ public class kaya : MonoBehaviour
     private readonly int IsWashing = Animator.StringToHash("washing");
     private readonly int IsGossiping = Animator.StringToHash("phonetalk");
     private readonly int IsWorking = Animator.StringToHash("makingpizza");
+    
     private readonly int IsTossing = Animator.StringToHash("pizzatoss");
     
 
@@ -52,24 +63,36 @@ public class kaya : MonoBehaviour
 
     void Statsnotstating()
     {
-        bladder -= Time.deltaTime * 0.5f;
-        nicotine -= Time.deltaTime * 0.3f;
-        hygiene -= Time.deltaTime * 0.5f;
-        gossip -= Time.deltaTime * 0.4f;
-        job -= Time.deltaTime * 0.8f;
+        bladder -= Time.deltaTime * 0.8f;
+        nicotine -= Time.deltaTime * 0.7f;
+        hygiene -= Time.deltaTime * 0.8f;
+        gossip -= Time.deltaTime * 0.6f;
+        job -= Time.deltaTime * 1f;
+
+        nicotineslider.value = nicotine;
+        hygieneslider.value = hygiene;
+        gossipslider.value = gossip;
+        bladderslider.value = bladder;
+        jobslider.value = job;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        Statsnotstating();
-       
-        if (bladder < 45)
+        if (stopstats == false)
         {
+            Statsnotstating();
+        }
+        
+       
+        if (bladder < 60)
+        {
+            
             Agent.SetDestination(bladdercostam.transform.position);
             if (Vector3.Distance(transform.position, bladdercostam.transform.position) > 0.5f)
             {
-
+                stopstats = false;
             }
             else
             {
@@ -77,87 +100,102 @@ public class kaya : MonoBehaviour
                 animator.SetBool(IsSitting, true);
                 transform.LookAt(paczalka.transform.position);
                 Invoke("bladderAdd", 5f);
+                stopstats = true;
+
             }
         }
 
        
         if (nicotine < 70)
         {
+            
             Agent.SetDestination(nicotinecostam.transform.position);
             if (Vector3.Distance(transform.position, nicotinecostam.transform.position) > 0.5f)
             {
-
+                stopstats = false;
             }
             else
             {
                 animator.GetBool(IsSmoking);
                 animator.SetBool(IsSmoking, true);
                 Invoke("smokingAdd", 5f);
+                stopstats = true;
             }
         }
 
         
         if (hygiene < 70)
         {
-            Agent.SetDestination(hygienecostam.transform.position);
-            if (Vector3.Distance(transform.position, hygienecostam.transform.position) > 0.5f)
-            {
-
-            }
-            else
-            {
-                animator.GetBool(IsWashing);
-                animator.SetBool(IsWashing, true);
-                transform.LookAt(paczalka2.transform.position);
-                Invoke("washingAdd", 5f);
-            }
+            Hygiene();
         }
 
         
-        if (gossip < 55)
+        if (gossip < 60)
         {
+            
             Agent.SetDestination(gossipcostam.transform.position);
             if (Vector3.Distance(transform.position, gossipcostam.transform.position) > 0.5f)
             {
-
+                stopstats = false;
             }
             else
             {
                 animator.GetBool(IsGossiping);
                 animator.SetBool(IsGossiping, true);
                 Invoke("gossipAdd", 5f);
+                stopstats = true;
             }
         }
 
         
-        if (job < 65)
+        if (job < 75)
         {
+            
             Agent.SetDestination(jobcostam.transform.position);
             if (Vector3.Distance(transform.position, jobcostam.transform.position) > 0.5f)
             {
-
+                stopstats = false;
             }
             else
             {
                 animator.GetBool(IsWorking);
                 animator.SetBool(IsWorking, true);
                 Invoke("workingAdd", 5f);
+                stopstats = true;
             }
         }
        
     }
 
+    void Hygiene()
+    {
+        
+        Agent.SetDestination(hygienecostam.transform.position);
+        if (Vector3.Distance(transform.position, hygienecostam.transform.position) > 0.5f)
+        {
+            stopstats = false;
+        }
+        else
+        {
+            animator.GetBool(IsWashing);
+            animator.SetBool(IsWashing, true);
+            transform.LookAt(paczalka2.transform.position);
+            Invoke("washingAdd", 5f);
+            stopstats=true;
+        }
+    }
     void Toss()
     {
         Agent.SetDestination(tosscostam.transform.position);
         if (Vector3.Distance(transform.position, tosscostam.transform.position) > 0.5f)
         {
-
+            
         }
         else
         {
             animator.GetBool(IsTossing);
             animator.SetBool(IsTossing, true);
+            //transform.LookAt(paczalka3.transform.position);
             Invoke("tossAdd", 2f);
         }
     }
@@ -198,17 +236,26 @@ public class kaya : MonoBehaviour
         Toss();
     }
 
-    void tossAdd()
-    {
-        animator.SetBool(IsTossing, false);
-        toss = 100;
-        pizza.SetActive(false);
-        pizza2.SetActive(true);
+    
+
+        void tossAdd()
+        {
+            animator.SetBool(IsTossing, false);
+            pizza.SetActive(false);
+            pizza2.SetActive(true);
+            StartCoroutine(pizzacooking());
         GoIdle();
-    }
+        }
 
-    void GoIdle()
-    {
+        void GoIdle()
+        {
+        stopstats = false;
+        }
 
-    }
+        IEnumerator pizzacooking()
+        {
+            yield return new WaitForSeconds(6f);
+            pizza2.SetActive (false);
+
+        }
 }
