@@ -6,6 +6,7 @@ TagManager:
   tags:
   - player
   - wall
+  - door
   layers:
   - Default
   - TransparentFX

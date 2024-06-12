@@ -1,11 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class kaya : MonoBehaviour
 {
+    public float timeScale;
+
     [Header("Stats")]
     [SerializeField] float nicotine;
     [SerializeField] float hygiene;
@@ -24,7 +25,7 @@ public class kaya : MonoBehaviour
     public GameObject jobcostam;
     public GameObject tosscostam;
     public GameObject pizza;
-    public GameObject pizza2;
+    public GameObject pizzaOven;
 
     public GameObject paczalka;
     public GameObject paczalka2;
@@ -46,15 +47,26 @@ public class kaya : MonoBehaviour
     private readonly int IsWashing = Animator.StringToHash("washing");
     private readonly int IsGossiping = Animator.StringToHash("phonetalk");
     private readonly int IsWorking = Animator.StringToHash("makingpizza");
-    
-    private readonly int IsTossing = Animator.StringToHash("pizzatoss");
-    
 
-    // Start is called before the first frame update
-    void Start()
+    private readonly int IsTossing = Animator.StringToHash("pizzatoss");
+
+
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if (other.CompareTag("door"))
+        {
+            other.GetComponent<MeshRenderer>().enabled = false;
+        }
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("door"))
+        {
+            other.GetComponent<MeshRenderer>().enabled = true;
+        }
+    }
+
     private void Awake()
     {
         Agent = GetComponent<NavMeshAgent>();
@@ -80,15 +92,17 @@ public class kaya : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        animator.SetFloat("velocity", Agent.velocity.magnitude);
+        Time.timeScale = Mathf.Clamp(timeScale, 0.1f, 30f);
         if (stopstats == false)
         {
             Statsnotstating();
         }
-        
-       
+
+
         if (bladder < 60)
         {
-            
+
             Agent.SetDestination(bladdercostam.transform.position);
             if (Vector3.Distance(transform.position, bladdercostam.transform.position) > 0.5f)
             {
@@ -105,10 +119,10 @@ public class kaya : MonoBehaviour
             }
         }
 
-       
+
         if (nicotine < 70)
         {
-            
+
             Agent.SetDestination(nicotinecostam.transform.position);
             if (Vector3.Distance(transform.position, nicotinecostam.transform.position) > 0.5f)
             {
@@ -123,16 +137,16 @@ public class kaya : MonoBehaviour
             }
         }
 
-        
+
         if (hygiene < 70)
         {
             Hygiene();
         }
 
-        
+
         if (gossip < 60)
         {
-            
+
             Agent.SetDestination(gossipcostam.transform.position);
             if (Vector3.Distance(transform.position, gossipcostam.transform.position) > 0.5f)
             {
@@ -147,10 +161,10 @@ public class kaya : MonoBehaviour
             }
         }
 
-        
+
         if (job < 75)
         {
-            
+
             Agent.SetDestination(jobcostam.transform.position);
             if (Vector3.Distance(transform.position, jobcostam.transform.position) > 0.5f)
             {
@@ -164,12 +178,12 @@ public class kaya : MonoBehaviour
                 stopstats = true;
             }
         }
-       
+
     }
 
     void Hygiene()
     {
-        
+
         Agent.SetDestination(hygienecostam.transform.position);
         if (Vector3.Distance(transform.position, hygienecostam.transform.position) > 0.5f)
         {
@@ -181,23 +195,23 @@ public class kaya : MonoBehaviour
             animator.SetBool(IsWashing, true);
             transform.LookAt(paczalka2.transform.position);
             Invoke("washingAdd", 5f);
-            stopstats=true;
+            stopstats = true;
         }
     }
     void Toss()
     {
         Agent.SetDestination(tosscostam.transform.position);
-        if (Vector3.Distance(transform.position, tosscostam.transform.position) > 0.5f)
-        {
-            
-        }
-        else
+        if (Vector3.Distance(transform.position, tosscostam.transform.position) <= 0.5f)
         {
             animator.GetBool(IsTossing);
             animator.SetBool(IsTossing, true);
             //transform.LookAt(paczalka3.transform.position);
-            Invoke("tossAdd", 2f);
+            Invoke("tossAdd", 1.5f);
         }
+        //else
+        //{
+
+        //}
     }
 
     void bladderAdd()
@@ -236,26 +250,24 @@ public class kaya : MonoBehaviour
         Toss();
     }
 
+    void tossAdd()
+    {
+        animator.SetBool(IsTossing, false);
+        pizza.SetActive(false);
+        pizzaOven.SetActive(true);
+        StartCoroutine(pizzacooking());
+        GoIdle();
+    }
     
 
-        void tossAdd()
-        {
-            animator.SetBool(IsTossing, false);
-            pizza.SetActive(false);
-            pizza2.SetActive(true);
-            StartCoroutine(pizzacooking());
-        GoIdle();
-        }
-
-        void GoIdle()
-        {
+    void GoIdle()
+    {
         stopstats = false;
-        }
+    }
 
-        IEnumerator pizzacooking()
-        {
-            yield return new WaitForSeconds(6f);
-            pizza2.SetActive (false);
-
-        }
+    IEnumerator pizzacooking()
+    {
+        yield return new WaitForSeconds(6f);
+        pizzaOven.SetActive(false);
+    }
 }
