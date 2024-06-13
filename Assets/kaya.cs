@@ -26,6 +26,8 @@ public class kaya : MonoBehaviour
     public GameObject tosscostam;
     public GameObject pizza;
     public GameObject pizzaOven;
+    public GameObject door;
+    public GameObject door2;
 
     public GameObject paczalka;
     public GameObject paczalka2;
@@ -55,7 +57,13 @@ public class kaya : MonoBehaviour
     {
         if (other.CompareTag("door"))
         {
-            other.GetComponent<MeshRenderer>().enabled = false;
+            //other.GetComponent<MeshRenderer>().enabled = false;
+            door.transform.rotation = Quaternion.Euler(0,90,0);
+        }
+        if (other.CompareTag("door2"))
+        {
+            //other.GetComponent<MeshRenderer>().enabled = false;
+            door2.transform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
 
@@ -63,7 +71,13 @@ public class kaya : MonoBehaviour
     {
         if (other.CompareTag("door"))
         {
-            other.GetComponent<MeshRenderer>().enabled = true;
+            //other.GetComponent<MeshRenderer>().enabled = true;
+            door.transform.rotation = Quaternion.Euler(0, 0, 0);
+        }
+        if (other.CompareTag("door2"))
+        {
+            //other.GetComponent<MeshRenderer>().enabled = false;
+            door2.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
     }
 
@@ -172,6 +186,7 @@ public class kaya : MonoBehaviour
             }
             else
             {
+                transform.rotation = jobcostam.transform.rotation;
                 animator.GetBool(IsWorking);
                 animator.SetBool(IsWorking, true);
                 Invoke("workingAdd", 5f);
@@ -203,6 +218,7 @@ public class kaya : MonoBehaviour
         Agent.SetDestination(tosscostam.transform.position);
         if (Vector3.Distance(transform.position, tosscostam.transform.position) <= 0.5f)
         {
+            transform.rotation = tosscostam.transform.rotation;
             animator.GetBool(IsTossing);
             animator.SetBool(IsTossing, true);
             //transform.LookAt(paczalka3.transform.position);
