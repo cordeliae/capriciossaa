@@ -4383,7 +4383,7 @@ MonoBehaviour:
   hygiene: 100
   gossip: 100
   bladder: 100
-  job: 80
+  job: 75
   Agent: {fileID: 638260421}
   animator: {fileID: 638260422}
   bladdercostam: {fileID: 1796453991}
